@@ -1,0 +1,202 @@
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <script language="javascript">
+        var fields = [];
+
+        function processTemplate() {
+           var template = $("#template").val();
+           $("#templateFields").html('');
+
+           //
+           // Extract variable names from the template.
+           //
+           let regex = /{{.*?}}/g;
+           let matches = template.match(regex);
+           fields = [];
+           matches.forEach(function(val, idx) {
+             let v = val.substring(2, 2 + val.length - 4);
+             fields.push(v);
+
+             //
+             // Construct an input element for this variable
+             //
+             let inputElement =
+               v
+               + ": <input id='"
+               + v
+               + "' size='20' />"
+               + "<br>";
+             $("#templateFields").append(inputElement);
+           });
+        }
+
+        function renderTemplate() {
+          //
+          // Render the template on the server using a PHP file.
+          //
+          let data = {
+            template: $("#template").val()
+          }
+
+          //
+          // Send the values of template variables, from the HTML input elements.
+          //
+          fields.forEach(function(val, idx) {
+            data[val] = $("#" + val).val();
+          });
+
+          $.ajax({
+            url: "/renderTemplate",
+            data: data,
+            success: function(data) {
+              $("#message").text(data);
+            },
+            error: function(e) {
+              alert(e.message);
+            }
+
+           });
+        }
+
+        function sendMail() {
+
+          //
+          // Get the current values of the html input elements.
+          //    Don't use message, we are going to build it again on the server.
+          //
+          let data = {
+            to: $("#to").val(),
+            from: $("#from").val(),
+            message: $("#message").text()
+          };
+
+          //
+          // Send email using sendgrid.
+          //
+          $.ajax({
+            url: "/sendgrid",
+            data: data,
+            success: function(data) {
+              if (data.indexOf("202 Accepted") == -1)  {
+                $("#sendgrid_response").html("<div style='color:red'>Send mail failed.</div>");
+              }
+              else
+                $("#sendgrid_response").html("<div style='color:green'>Send mail succeeded!</div>");
+
+              $("#sendgrid_data").html(data);
+            },
+            error: function(e) {
+              alert(e.message);
+            }
+
+           });
+        }
+    </script>
+
+    <style>
+        body {
+          font-family: sans-serif;
+        }
+        #template {
+          margin: 10px;
+        }
+
+        .step {
+          padding: 10px;
+          margin: 10px;
+          margin-bottom: 50px;
+
+          width: 60%;
+
+          border: 1px solid gray;
+          background-color: white;
+        }
+
+        .title {
+          background-color:lightgray;
+          margin: 4px;
+          padding: 5px;
+          border: 1px solid black;
+        }
+
+        button {
+          margin-top: 15px;
+          padding: 5px;
+          font-weight: 600;
+        }
+
+        #templateFields {
+          margin-left:30px;
+          margin-top: 20px;
+        }
+
+        #sendgrid_data {
+          font-size:9pt;
+        }
+
+    </style>
+
+</head>
+<body>
+    <h1>
+      Mail Merge
+    </h1>
+    <div class="step">
+        <div class="title">
+          1.  Create an email template
+        </div>
+        <textarea id="template" rows="8" cols="80"></textarea>
+        <div>
+<pre>
+<i>Example:
+
+Hi {{contact_first_name}},
+
+Get {{discount_rate}} off your next purchase using this discount code:
+    {{discount_code}}.</i>
+</pre>
+        </div>
+
+        <button onclick="javascript:processTemplate()">process template</button>
+    </div>
+
+    <div class="step">
+        <div class="title">
+          2. Supply values for the variables
+        </div>
+        <div id="templateFields"></div>
+        <button onclick="javascript:renderTemplate()">preview email message</button>
+
+
+    </div>
+
+    <div class="step">
+        <div class="title">
+          3. Send it
+        </div>
+
+        <div>
+            From: <input id="from" size="20" value="john.r.dimm@gmail.com" />
+            <br>
+            To: <input id="to" size="20" value="jdimm@yahoo.com" />
+        </div>
+
+        <div>
+            <pre><div id="message"></div></pre>
+        </div>
+
+        <button onclick="javascript:sendMail()">send mail</button>
+
+        <div>
+            <pre>
+                <div id="sendgrid_response"></div>
+                <div id="sendgrid_data"></div>
+            </pre>
+        </div>
+    </div>
+
+
+</body>
+</html>

@@ -1,0 +1,46 @@
+body {
+  font-family: sans-serif;
+  margin: 10px;
+}
+
+#pageTitle {
+  font-size: 24pt;
+  font-weight: 600;
+}
+
+#titleBar{
+   margin-bottom: 10px;
+}
+
+.step {
+  padding: 10px;
+  margin-bottom: 50px;
+  width: 60%;
+  min-width:520px;
+  border: 1px solid gray;
+}
+
+.title {
+  background-color:lightgray;
+  margin: 4px;
+  margin-bottom: 15px;
+  padding: 5px;
+  border: 1px solid black;
+}
+
+button {
+  margin-top: 15px;
+  margin-bottom: 10px;
+  padding: 5px;
+  font-weight: 600;
+}
+
+#templateFields {
+  margin-left:30px;
+  margin-top: 20px;
+}
+
+#sendgrid_data {
+  font-size:9pt;
+  margin:10px;
+}

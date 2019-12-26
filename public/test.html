@@ -1,0 +1,45 @@
+<script>
+
+  function sendMail() {
+    var data = new FormData();
+    data.append('to', 'to@email');
+    data.append('from', 'from@email');
+    data.append('message', 'hi from test.html');
+
+    let url = "http://localhost:3000/receiveForm";
+    // url = "/cgi-bin/stub.py";
+
+    fetch(url,{
+          method: "POST",
+          body: data
+        })
+          .then(function (response) {
+             return response.json();
+
+             //var t = await response.text();
+             //var j = JSON.parse(t);
+             //return j;
+        }).then(function (data) {
+          //
+          // Save the sendgrid response.
+          //
+          console.log(JSON.stringify(data));
+        });
+  }
+
+</script>
+<body>
+  <form action="/receiveForm" method="post">
+    to: <input name="to" />
+    <br />
+    from: <input name="from" />
+    <br />
+    message:
+    <br />
+    <textarea name="message" rows="6" cols="80"></textarea>
+    <input type="submit" />
+  </form>
+
+  <button onClick="javascript:sendMail()">send POST using javascript</button>
+
+</body>
