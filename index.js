@@ -33,18 +33,24 @@ app.set('views', path.resolve(__dirname, 'views'));
 // app.engine('handlebars', handlebars.engine);
 // app.set('view engine', 'handlebars'); //sets express view engine to handlebars
 
+
+
+app.set('port', process.env.PORT || 3000);  //sets port 3000
+
 app.engine('html', handlebars.engine);
 app.set('view engine', 'html');
 
-app.set('port', process.env.PORT || 3000);  //sets port 3000
 
 //
 // Test sending data from a static POST.
 //
 app.post('/receiveForm', function(req, res) {
-  var body = JSON.stringify(req.body);
-  console.log(body);
-  res.send({"response":body});
+  // The params are the first key, as a string, when coming from jasmine.
+ // var keys = Object.keys(req['body']);
+ // var params = JSON.parse(keys[0]);
+
+  var params = req.body;
+  res.send({"response": params});
 });
 
 app.get('/test', function(req,res){
@@ -69,18 +75,26 @@ app.get('/test', function(req,res){
 // Render a dynamic template created by the user of Mail Merge
 //
 app.post('/renderTemplate', function (req, res) {
-   let template = req.body.template;
-   let compiled = hbr.compile(template);
+  // When the request comes from the app, the body has the expected hash.
+  var params = req.body;
 
-   //
-   // req.body has the variables mentioned in the template.
-   //
-   let response = compiled(req.body);
+  // When the request comes from jasmine, the params are the
+  // first and only key of body, as a JSON string.  Strange.
+  // Must be something about how we tell jasmine to send the request.
+  var keys = Object.keys(req.body);
+  if (keys && keys.length == 1) {
+    params = JSON.parse(keys[0]);
+  }
 
-   //
-   // Wrap with json.
-   //
-   res.send({"response":response});
+  // Compile the template using handlebars.
+  let template = params['template'];
+  let compiled = hbr.compile(template);
+
+  // params has the variables mentioned in the template.
+  let response = compiled(params);
+
+  console.log("response=" + response);
+  res.send({"response":response});
 });
 
 
