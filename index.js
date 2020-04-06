@@ -30,10 +30,6 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 app.set('views', path.resolve(__dirname, 'views'));
 
-// app.engine('handlebars', handlebars.engine);
-// app.set('view engine', 'handlebars'); //sets express view engine to handlebars
-
-
 
 app.set('port', process.env.PORT || 3000);  //sets port 3000
 
